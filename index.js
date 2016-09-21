@@ -1,20 +1,19 @@
-var express = require('express');
-var app = express();
+const express = require('express');
+const socketIO = require('socket.io');
+const path = require('path');
 
-app.set('port', (process.env.PORT || 5000));
+const PORT = process.env.PORT || 5000;
+const INDEX = path.join(__dirname, 'index.html');
 
-app.use(express.static(__dirname + '/public'));
+const server = express()
+  .use((req, res) => res.sendFile(INDEX) )
+  .listen(PORT, () => console.log(`Listening on ${ PORT }`));
 
-// views is directory for all template files
-app.set('views', __dirname + '/views');
-app.set('view engine', 'ejs');
+const io = socketIO(server);
 
-app.get('/', function(request, response) {
-  response.render('pages/index');
+io.on('connection', (socket) => {
+  console.log('Client connected');
+  socket.on('disconnect', () => console.log('Client disconnected'));
 });
 
-app.listen(app.get('port'), function() {
-  console.log('Node app is running on port', app.get('port'));
-});
-
-
+setInterval(() => io.emit('time', new Date().toTimeString()), 1000);
