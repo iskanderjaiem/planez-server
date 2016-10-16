@@ -12,8 +12,10 @@ const server = express()
 const io = socketIO(server);
 
 io.on('connection', (socket) => {
-  console.log('Client connected');
-  socket.on('disconnect', () => console.log('Client disconnected'));
+  console.log("Player Connected!");
+  socket.emit("socketID", { id: socket.id } );
+  socket.broadcast.emit("newPlayer", { id: socket.id } );
+  socket.on('disconnect', () => console.log('Player disconnected'));
 });
 
 setInterval(() => io.emit('time', new Date().toTimeString()), 1000);
